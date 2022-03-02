@@ -9,5 +9,4 @@ Go to [releases](https://github.com/cucumber-sp/SFSBuildUpgrade/releases) and do
 
 ## preview 📷
 
-![Imgur](https://i.imgur.com/oP6cZzf.png)  
-![Imgur](https://i.imgur.com/Pb5Vju7.png)
+![Screenshot](https://user-images.githubusercontent.com/100789522/156414850-ad808fc7-bfd6-4dfc-a473-cdce868433fa.png)
