@@ -1,9 +1,9 @@
-# RefillMod
-_Simple mod to refill fuel in runtime._
+# BuildUpgrade Mod
+_A mod that allows you to edit details directly in the game._
 
-## How to install RefillMod 🚀
+## How to install BuildUpgrade Mod 🚀
 
-Go to [releases](https://github.com/dani0105/RefillMod/releases) and download `RefillMod.dll`. Once download, put `RefillMod.dll` into `MODS` folder in `Spaceflight Simulator_Data`. You can found `Spaceflight Simulator_Data` in folder where you install steam in the nex path: Steam\steamapps\common\Spaceflight Simulator\Spaceflight Simulator Game\Spaceflight Simulator_Data. Finally, execute game normaly.
+Go to [releases](https://github.com/cucumber-sp/SFSBuildUpgrade/releases) and download `BuildUpgrade.dll`. Once download, put `BuildUpgrade.dll` into `MODS` folder in `Spaceflight Simulator_Data`. You can found `Spaceflight Simulator_Data` in folder where you install steam in the nex path: Steam\steamapps\common\Spaceflight Simulator\Spaceflight Simulator Game\Spaceflight Simulator_Data. Finally, execute game normaly.
 
 
 ## preview 📷
