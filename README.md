@@ -1,5 +1,5 @@
 # BuildUpgrade Mod
-_A mod that allows you to edit details directly in the game._
+_A mod that allows you to edit parts directly in the game._
 
 ## How to install BuildUpgrade Mod 🚀
 
