@@ -4,6 +4,7 @@ using SFS.Parts.Modules;
 using SFS.World;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace BuildUpgrade
 {
     public class BuildMethods
     {
+        public static bool noAdaptOverride = false;
         public static Vector2 MyGetSnapPosition(Vector2 position, HoldGrid hold_grid)
         {
             hold_grid.holdGrid.transform.position = position;
@@ -21,22 +23,22 @@ namespace BuildUpgrade
             float num = float.PositiveInfinity;
             if (modules.Length <= 8 && Menu.IsSnap)
             {
-                MagnetModule[] array = modules;
-                foreach (MagnetModule a2 in array)
-                {
-                    MagnetModule[] array2 = modules2;
-                    foreach (MagnetModule b in array2)
-                    {
-                        foreach (Vector2 snapOffset in MagnetModule.GetSnapOffsets(a2, b, 0.75f))
-                        {
-                            if (snapOffset.sqrMagnitude < num)
-                            {
-                                vector = snapOffset;
-                                num = snapOffset.sqrMagnitude;
-                            }
-                        }
-                    }
-                }
+                List<Vector2> allSnapOffsets = MagnetModule.GetAllSnapOffsets(modules, modules2, 0.75f);
+			if (allSnapOffsets.Count > 0)
+			{
+				allSnapOffsets.Sort((Vector2 a, Vector2 b) => a.sqrMagnitude.CompareTo(b.sqrMagnitude));
+				foreach (Vector2 item in allSnapOffsets)
+				{
+                        Vector2 transformVector = hold_grid.holdGrid.transform.position;
+                        hold_grid.transform.position = position;
+                        bool collisionResult = Polygon.Intersect(Part_Utility.GetBuildColliderPolygons(hold_grid.holdGrid.partsHolder.parts.ToArray()).normal, buildColliders, -0.08f);
+                        hold_grid.holdGrid.transform.position = transformVector;
+                        if (!collisionResult)
+					{
+						return position + item;
+					}
+				}
+			}
             }
             if (num < float.PositiveInfinity)
             {
@@ -76,15 +78,15 @@ namespace BuildUpgrade
             Part[] parts = BuildManager.main.buildGrid.GetSelectedParts();
             if (parts.Length > 0)
             {
-                Menu.x_orientation_string = parts.ElementAt(0).orientation.orientation.Value.x.ToString();
-                Menu.y_orientation_string = parts.ElementAt(0).orientation.orientation.Value.y.ToString();
-                Menu.z_orientation_string = parts.ElementAt(0).orientation.orientation.Value.z.ToString();
-                Menu.x_position_string = parts.ElementAt(0).Position.x.ToString();
-                Menu.y_position_string = parts.ElementAt(0).Position.y.ToString();
-                Menu.width_original_string = Math.Max(Math.Max(parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_original"), parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width")), parts.ElementAt(0).variablesModule.doubleVariables.GetValue("size")).ToString();
-                Menu.width_b_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_b").ToString();
-                Menu.width_a_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_a").ToString();
-                Menu.height_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("height").ToString();
+                Menu.x_orientation_string = parts.ElementAt(0).orientation.orientation.Value.x.ToString(CultureInfo.InvariantCulture);
+                Menu.y_orientation_string = parts.ElementAt(0).orientation.orientation.Value.y.ToString(CultureInfo.InvariantCulture);
+                Menu.z_orientation_string = parts.ElementAt(0).orientation.orientation.Value.z.ToString(CultureInfo.InvariantCulture);
+                Menu.x_position_string = parts.ElementAt(0).Position.x.ToString(CultureInfo.InvariantCulture);
+                Menu.y_position_string = parts.ElementAt(0).Position.y.ToString(CultureInfo.InvariantCulture);
+                Menu.width_original_string = Math.Max(Math.Max(parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_original"), parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width")), parts.ElementAt(0).variablesModule.doubleVariables.GetValue("size")).ToString(CultureInfo.InvariantCulture);
+                Menu.width_b_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_b").ToString(CultureInfo.InvariantCulture);
+                Menu.width_a_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("width_a").ToString(CultureInfo.InvariantCulture);
+                Menu.height_string = parts.ElementAt(0).variablesModule.doubleVariables.GetValue("height").ToString(CultureInfo.InvariantCulture);
                 return;
             }
             Menu.x_orientation_string = "";
@@ -102,7 +104,7 @@ namespace BuildUpgrade
             Part[] parts = BuildManager.main.buildGrid.GetSelectedParts();
             if (parts.Length > 0)
             {
-                parts.ElementAt(0).orientation.orientation.Value = new SFS.Orientation(float.Parse(Menu.x_orientation_string), float.Parse(Menu.y_orientation_string), float.Parse(Menu.z_orientation_string));
+                parts.ElementAt(0).orientation.orientation.Value = new Orientation(float.Parse(Menu.x_orientation_string, CultureInfo.InvariantCulture), float.Parse(Menu.y_orientation_string, CultureInfo.InvariantCulture), float.Parse(Menu.z_orientation_string, CultureInfo.InvariantCulture));
                 parts.ElementAt(0).RegenerateMesh();
             }
 
@@ -112,7 +114,7 @@ namespace BuildUpgrade
             Part[] parts = BuildManager.main.buildGrid.GetSelectedParts();
             if (parts.Length > 0)
             {
-                parts.ElementAt(0).Position = new Vector2(float.Parse(Menu.x_position_string), float.Parse(Menu.y_position_string));
+                parts.ElementAt(0).Position = new Vector2(float.Parse(Menu.x_position_string, CultureInfo.InvariantCulture), float.Parse(Menu.y_position_string, CultureInfo.InvariantCulture));
                 parts.ElementAt(0).RegenerateMesh();
             }
 
@@ -123,12 +125,12 @@ namespace BuildUpgrade
             Part[] parts = BuildManager.main.buildGrid.GetSelectedParts();
             if (parts.Length > 0)
             {
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width", double.Parse(Menu.width_original_string));
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_original", double.Parse(Menu.width_original_string));
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_b", double.Parse(Menu.width_b_string));
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_a", double.Parse(Menu.width_a_string));
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("height", double.Parse(Menu.height_string));
-                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("size", double.Parse(Menu.width_original_string));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width", double.Parse(Menu.width_original_string, CultureInfo.InvariantCulture));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_original", double.Parse(Menu.width_original_string, CultureInfo.InvariantCulture));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_b", double.Parse(Menu.width_b_string, CultureInfo.InvariantCulture));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("width_a", double.Parse(Menu.width_a_string, CultureInfo.InvariantCulture));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("height", double.Parse(Menu.height_string, CultureInfo.InvariantCulture));
+                parts.ElementAt(0).variablesModule.doubleVariables.SetValue("size", double.Parse(Menu.width_original_string, CultureInfo.InvariantCulture));
                 parts.ElementAt(0).RegenerateMesh();
                 AdaptModule.UpdateAdaptation(parts);
             }
