@@ -39,6 +39,22 @@ namespace BuildUpgrade
         }
     }
 
+    [HarmonyPatch(typeof(HoldGrid), "TakePart_PickGrid")]
+    class AdaptPartPicker
+    {
+        [HarmonyPrefix]
+        static void Prefix()
+        {
+            BuildMethods.noAdaptOverride = true;
+        }
+
+        [HarmonyPostfix]
+        static void Postfix()
+        {
+            BuildMethods.noAdaptOverride = false;
+        }
+    }
+
     [HarmonyPatch(typeof(BuildGrid), "Start")]
     public class BuildGrid_Start
     {
@@ -49,13 +65,17 @@ namespace BuildUpgrade
         }
     }
 
-    [HarmonyPatch(typeof(AdaptModule), "Adapt")]
-    public class AdaptModule_Adapt
+    [HarmonyPatch(typeof(PartGrid), "UpdateAdaptation")]
+    public class PartGrid_Adapt
     {
         [HarmonyPrefix]
         public static bool Prefix()
         {
-            return Menu.isAdaptationOn;
+            if (!Menu.isAdaptationOn && !BuildMethods.noAdaptOverride)
+            {
+                return false;
+            }
+            return true;
         }
     }
 
