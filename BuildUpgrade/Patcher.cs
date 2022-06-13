@@ -65,7 +65,7 @@ namespace BuildUpgrade
         }
     }
 
-    [HarmonyPatch(typeof(PartGrid), "UpdateAdaptation")]
+    [HarmonyPatch(typeof(AdaptModule), "Adapt")]
     public class PartGrid_Adapt
     {
         [HarmonyPrefix]
